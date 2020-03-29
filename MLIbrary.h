@@ -1,24 +1,6 @@
-inline int getAddress(uint32_t message) {
-  uint32_t value = message;
-  unsigned int count = 0;
-
-  if(value == 0) {
-    return 0;
-  }
-  
-  while (value) {
-    count ++;
-    value <<= 1;
-  }
-  Serial.println(count);
-  return message >> count - 2;
-  //  return (message & 0xFF) >> 4;
-}
-
 uint8_t getBit() {
   unsigned long time = micros();
-  while (digitalRead(M_IN) == LOW) {
-    //wait
+  while (digitalRead(2) == LOW) {
   }
   if (micros() - time < 1000) {
     return 0;
@@ -37,15 +19,16 @@ uint32_t receive() {
     }
   }
   long t2 = micros();
-  Serial.println();
-  Serial.print("R: ");
-  Serial.print(t1);
-  Serial.print(" - ");
-  Serial.print(t2);
-  Serial.print(" = ");
-  Serial.print(t2 - t1);
-  Serial.print(" RES ");
-  Serial.print(String(res, HEX));
+  if (debug) {
+    Serial.print("R: ");
+    Serial.print(t1);
+    Serial.print(" - ");
+    Serial.print(t2);
+    Serial.print(" = ");
+    Serial.print(t2 - t1);
+    Serial.print(" RES ");
+    Serial.println(String(res, HEX));
+  }
   needReceive = false;
   return res;
 }
@@ -53,7 +36,7 @@ uint32_t receive() {
 void sendZero()
 {
   digitalWrite(M_OUT, HIGH);
-  delayMicroseconds(550);
+  delayMicroseconds(600);
   digitalWrite(M_OUT, LOW);
   delayMicroseconds(2400);
 }
@@ -61,7 +44,7 @@ void sendZero()
 void sendOne()
 {
   digitalWrite(M_OUT, HIGH);
-  delayMicroseconds(1750);
+  delayMicroseconds(1800);
   digitalWrite(M_OUT, LOW);
   delayMicroseconds(1200);
 }
@@ -85,13 +68,12 @@ void writeHexBitWise(uint8_t message) {
   }
 }
 
-void send(const char message[], int size) {
-  delay(150);
-
-  Serial.println();
-  Serial.print("S: ");
-  Serial.print(message);
-
+void send(const char message[], int size, int delayValue) {
+  if (debug) {
+    Serial.print("S: ");
+    Serial.println(message);
+  }
+  delay(delayValue);
   uint8_t controlSum = 0;
   for (int i = 0; i < size; i++) {
     uint8_t output = toHex(message[i]);
@@ -100,4 +82,8 @@ void send(const char message[], int size) {
   }
   controlSum += 1;
   writeHexBitWise(controlSum);
+}
+
+void send(const char message[], int size) {
+  send(message, size, 90);
 }
