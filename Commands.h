@@ -6,6 +6,7 @@
 #define TRACK_POS_F 3
 #define TRACK_POS_S 4
 
+//Адрес cd changer'a - 5, ответ D; адрес yatour 1, ответ 9! команды те же
 char PING_ANSWER[] = "D8";                //58E
 char HARDWARE_STATUS[] = "DB91000000C";   //59D
 char DISC_COUNT[] = "DD123456000000FC0";  //59D
